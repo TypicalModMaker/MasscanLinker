@@ -72,7 +72,7 @@ public class ServerThread {
                               if (MasscanClient.getInstance().getProcessOutput() != null && MasscanClient.getInstance().getProcessOutput().process.isAlive()) {
                                   MasscanClient.getInstance().getProcessOutput().sendStatus();
                               } else {
-                                  Packet.builder().putByte(1).putString("N/A" + MasscanClient.getInstance().getProcessOutput().isFinishing()).queueAndFlush(client);
+                                  Packet.builder().putByte(1).putString("N/A " + MasscanClient.getInstance().getProcessOutput().isFinishing()).queueAndFlush(client);
                               }
                           });
                           break;
@@ -121,11 +121,7 @@ public class ServerThread {
     }
 
     public void sendStatus(final String line) {
-        String kpps = line.split("rate: ")[1].split("-kpps")[0];
-        String percentage = line.split(", ")[1].split(" done")[0].split(" ")[1];
-        String found = line.split("found=")[1].split(" ")[0];
-        String remaining = line.split(" remaining")[0].split("done,")[1];
-        Packet.builder().putByte(1).putString(kpps + "|" + percentage + "|" + found + "|" + remaining).queueAndFlush(client);
+        Packet.builder().putByte(1).putString(line).queueAndFlush(client);
     }
 
     public void checkKeepAlives() {
@@ -160,25 +156,24 @@ public class ServerThread {
                 return;
             }
 
-            String finalLine = line;
             Thread t = new Thread(() -> {
                 HttpClient httpclient = HttpClients.createDefault();
                 try {
                     URI address = new URI("http", null, masterIP, 1338, "/hit", null, null);
                     HttpPost httppost = new HttpPost(address);
                     httppost.setHeader("key", "MASSCANLINKER-1337");
-                    httppost.setHeader("hit", finalLine);
+                    httppost.setHeader("hit", line);
                     httpclient.execute(httppost);
                     MasscanClient.getInstance().getQueuedHits().remove();
-                    if(MasscanClient.getInstance().getQueuedHits().size() > 0 && MasscanClient.getInstance().getQueuedHits().element() == null) {
+                    if(!MasscanClient.getInstance().getQueuedHits().isEmpty() && MasscanClient.getInstance().getQueuedHits().element() == null) {
                         sendHit(MasscanClient.getInstance().getQueuedHits().element() );
                     } else if(MasscanClient.getInstance().getProcessOutput().isFinishing()) {
                         System.exit(0);
                     }
                 } catch (URISyntaxException | IOException e) {
                     System.out.println("[INFO] Failed to send hit to the Master Server! [1]");
-                    if(!MasscanClient.getInstance().getQueuedHits().contains(finalLine)) {
-                        MasscanClient.getInstance().getQueuedHits().add(finalLine);
+                    if(!MasscanClient.getInstance().getQueuedHits().contains(line)) {
+                        MasscanClient.getInstance().getQueuedHits().add(line);
                     }
                 } catch (NoSuchElementException ignored) {}
             });

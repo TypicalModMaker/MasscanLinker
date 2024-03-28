@@ -51,6 +51,7 @@ public class ProcessOutput
                     }
                     if(line.contains("waiting")) {
                         finishing = true;
+
                         if(!MasscanClient.getInstance().getQueuedHits().isEmpty() && MasscanClient.getInstance().getQueuedHits().element() == null) {
                             MasscanClient.getInstance().getServerThread().sendHit(Objects.requireNonNull(MasscanClient.getInstance().getQueuedHits().element()));
                         } else {
@@ -79,6 +80,19 @@ public class ProcessOutput
     public void sendStatus() {
         System.out.println("[INFO] Received a STATUS request.");
         sendStatus = true;
+
+        Thread t = new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+                if(sendStatus) {
+                    MasscanClient.getInstance().getServerThread().sendStatus("Failed to retrieve status from process");
+                    sendStatus = false;
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        t.start();
     }
     public void stopProcess() {
         process.destroy();

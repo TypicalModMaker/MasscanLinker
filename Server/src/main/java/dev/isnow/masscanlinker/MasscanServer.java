@@ -264,8 +264,10 @@ public class MasscanServer {
                         System.out.println("No clients connected!");
                         System.exit(0);
                     }
-                    List<String> splitted = NewIPRangeSplitter.splitIpRanges(scanips, clients);
-                    List<List<String>> perClient = NewIPRangeSplitter.splitIpRangesToClients(splitted, clients);
+                    NewIPRangeSplitter splitter = new NewIPRangeSplitter();
+                    List<String> splitted = splitter.splitIpRanges(scanips, clients);
+                    List<List<String>> perClient = splitter.splitIpRangesToClients(splitted, clients);
+
 
                     int index = 0;
                     for (String key : clientListener.getClients().keySet()) {

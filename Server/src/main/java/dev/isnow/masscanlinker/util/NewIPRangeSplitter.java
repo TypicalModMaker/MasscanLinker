@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 import java.util.ArrayList;
 import java.util.List;
 
-@UtilityClass
 public class NewIPRangeSplitter {
 
     public List<List<String>> splitIpRangesToClients(List<String> splitRanges, int numClients) {
@@ -31,25 +30,28 @@ public class NewIPRangeSplitter {
 
             long rangeSize = end - start + 1;
             long subRangeSize = rangeSize / numClients;
+            long remaining = rangeSize % numClients;
 
+            long subRangeStart = start;
             for (int i = 0; i < numClients; i++) {
-                long subRangeStart = start + i * subRangeSize;
                 long subRangeEnd = subRangeStart + subRangeSize - 1;
-                if (i == numClients - 1) {
-                    subRangeEnd = end;
+                if (remaining > 0) {
+                    subRangeEnd++;
+                    remaining--;
                 }
                 splitRanges.add(longToIp(subRangeStart) + "-" + longToIp(subRangeEnd));
+                subRangeStart = subRangeEnd + 1;
             }
         }
         return splitRanges;
     }
 
+
     private long ipToLong(String ipAddress) {
         String[] parts = ipAddress.split("\\.");
         long result = 0;
-        for (int i = 0; i < parts.length; i++) {
-            int power = 3 - i;
-            result += (Integer.parseInt(parts[i]) % 256 * Math.pow(256, power));
+        for (int i = 0; i < 4; i++) {
+            result += (Long.parseLong(parts[i]) << (8 * (3 - i)));
         }
         return result;
     }

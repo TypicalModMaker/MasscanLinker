@@ -72,7 +72,7 @@ public class MasscanServer {
         if(inProgress.equalsIgnoreCase("yes")) {
             scanningFile = new File(outputFolder, "masscanlinker-recovered.txt");
             System.out.println("Starting ClientListener...");
-            clientListener = new ClientListener(1340);
+            clientListener = new ClientListener(1337);
             startTime = System.currentTimeMillis();
             String line;
             try {

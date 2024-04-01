@@ -1,6 +1,8 @@
 package dev.isnow.masscanlinker.checker;
 
 import dev.isnow.masscanlinker.checker.data.FinalResponse;
+import dev.isnow.masscanlinker.checker.rawData.Players;
+import dev.isnow.masscanlinker.checker.rawData.Version;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
@@ -17,9 +19,15 @@ public class ServerChecker
         pingOptions.setTimeout(2500);
         try {
             final FinalResponse response = mcPing.getPing(pingOptions);
+            if(response == null) {
+                return "FAILED";
+            }
+            if(response.getVersion() == null || response.getVersion().getName() == null) {
+                response.setVersion(new Version("NULL VERSION", 0));
+            }
             return "(" + ip + ":" + port + ")(" + response.getPlayers().getOnline() + "/" + response.getPlayers().getMax() + ")(" + response.getVersion().getName() + ")(" + clean(response.getDescription()) + ")";
         }
-        catch (final IOException ignored) {
+        catch (final IOException | NullPointerException ignored) {
             return "FAILED";
         }
     }

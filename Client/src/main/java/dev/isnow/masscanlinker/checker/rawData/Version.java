@@ -16,4 +16,13 @@ public class Version
     public String getName() {
         return this.name;
     }
+
+    public Version(String name, int protocol) {
+        this.name = name;
+        this.protocol = protocol;
+    }
+    public Version() {
+        this.name = "NoName";
+        this.protocol = 0;
+    }
 }

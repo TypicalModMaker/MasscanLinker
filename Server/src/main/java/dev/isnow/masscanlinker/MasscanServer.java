@@ -212,17 +212,15 @@ public class MasscanServer {
                 String masterIP = IPUtils.getIP();
                 for (InetAddress ip : ips) {
                     int finalCount = count;
-                    ProcessBuilder ps = new ProcessBuilder("ssh", "-o", "StrictHostKeyChecking=no", ip.getHostAddress(), "-i", "/root/.ssh/id_rsa", "-t", "screen", "-d", "-m", "java", "-jar", "ClientMASSCAN.jar", masterIP, "VPS" + finalCount);
-                    try {
-                        ps.start();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Thread t = new Thread(() -> {
+                        ProcessBuilder ps = new ProcessBuilder("ssh", "-o", "StrictHostKeyChecking=no", ip.getHostAddress(), "-i", "/root/.ssh/id_rsa", "-t", "screen", "-d", "-m", "java", "-jar", "ClientMASSCAN.jar", masterIP, "VPS" + finalCount);
+                        try {
+                            ps.start();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    t.start();
 //                    Thread clientThread = new Thread(() -> {
 ////                        com.github.simplenet.Client client = new com.github.simplenet.Client();
 ////                        client.onConnect(() -> {
@@ -246,6 +244,14 @@ public class MasscanServer {
                     count++;
                 }
 
+            }
+
+            while (clientListener.getClients().size() != ips.size()) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             String finalPortrange = portrange;

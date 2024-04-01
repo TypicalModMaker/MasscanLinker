@@ -37,6 +37,7 @@ public class ClientListener {
                 }
                 System.out.println("[DEBUG] Client " + address + " has connected!");
 
+
                 SocketAddress finalAddress1 = address;
                 client.postDisconnect(() -> {
                     clients.values().stream().filter(masscanClient1 -> masscanClient1.getIp() == finalAddress1).findFirst().ifPresent(masscanClient1 -> clients.remove(masscanClient1.getName()));

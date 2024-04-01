@@ -2,10 +2,12 @@ package dev.isnow.masscanlinker.checker.data;
 
 import dev.isnow.masscanlinker.checker.rawData.Version;
 import dev.isnow.masscanlinker.checker.rawData.Players;
+import lombok.Setter;
 
 public class FinalResponse extends MCResponse
 {
-    private final String description;
+    @Setter
+    private String description;
     
     public FinalResponse(final Players players, final Version version, final String favicon, final String description) {
         this.description = description;
